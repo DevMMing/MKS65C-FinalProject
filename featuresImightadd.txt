@@ -1,0 +1,6 @@
+Spyfall
+Weird GM player game and stuff happens
+-GM controls monster ai and player controls their own actions
+-Both players expend and only hero gains VP.
+~Colorful Text~
+Text Adventure with fun
