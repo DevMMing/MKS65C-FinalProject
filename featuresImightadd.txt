@@ -3,4 +3,6 @@ Weird GM player game and stuff happens
 -GM controls monster ai and player controls their own actions
 -Both players expend and only hero gains VP.
 ~Colorful Text~
-Text Adventure with fun
+Text Adventure with fun graphics and story
+having more pipes for multiclients
+adding sound(time cat > ctrl+c) or (time read) + <enter>
