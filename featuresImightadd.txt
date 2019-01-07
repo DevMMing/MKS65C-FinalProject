@@ -6,3 +6,5 @@ Weird GM player game and stuff happens
 Text Adventure with fun graphics and story
 having more pipes for multiclients
 adding sound(time cat > ctrl+c) or (time read) + <enter>
+adding sighandlers to socket to have accurate count of clients on server
+
