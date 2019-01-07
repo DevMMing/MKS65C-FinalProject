@@ -11,7 +11,7 @@ void sighand(int sig){
 char *  rot13(char * str){
   for(int i = 0; str[i]; i++){
     if( str[i] >= 'a' && str[i] < 'n')
-      str[i] += 13;       
+      str[i] += 13;
     else if( str[i] >= 'n' && str[i] <= 'z')
       str[i] -= 13;
   }
@@ -43,4 +43,3 @@ int main() {
   }
   return 0;
 }
-

@@ -1,33 +1,21 @@
-#include "pipe_networking.h"
-#include <signal.h>
-static void sighandler(int sig){
+#include "networking.h"
 
-  if (sig == SIGINT){
-    exit(0);
+int main(int argc, char **argv) {
+
+  int server_socket;
+  char buffer[BUFFER_SIZE];
+
+  if (argc == 2)
+    server_socket = client_setup( argv[1]);
+  else
+    server_socket = client_setup( TEST_IP );
+
+  while (1) {
+    printf("enter data: ");
+    fgets(buffer, sizeof(buffer), stdin);
+    *strchr(buffer, '\n') = 0;
+    write(server_socket, buffer, sizeof(buffer));
+    read(server_socket, buffer, sizeof(buffer));
+    printf("received: [%s]\n", buffer);
   }
-if (sig == SIGUSR1)
-    {
-        printf("Received SIGUSR1!\n");
-		printf("Parent Process: %d\n",getppid());
-}
-
-}
-int main() {
-
-  signal(SIGINT,sighandler);
-  int to_server;
-  int from_server;
-
-  from_server = client_handshake( &to_server );
-  char * input = malloc(BUFFER_SIZE);
-  char * output = malloc(BUFFER_SIZE);
-  while(1){
-    printf("My input to server: ");
-    fgets(input,BUFFER_SIZE,stdin);
-    strtok(input,"\n");
-    write(to_server, input, BUFFER_SIZE);
-    read(from_server, output, BUFFER_SIZE);
-    printf("The server returns: %s\n\n", output);
-  }
- return 0;
 }
