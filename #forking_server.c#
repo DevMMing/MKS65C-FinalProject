@@ -3,8 +3,12 @@
 void process(char *s);
 void subserver(int from_client);
 #define MAX_CLIENTS 20
-typedef
-char *clients[MAX_CLIENTS]=""
+
+typedef struct{
+  int uid;
+  char * name;
+}client;
+client *clients[MAX_CLIENTS];
 
 int main() {
 
@@ -43,5 +47,14 @@ void process(char * s) {
     else  if (*s >= 'A' && *s <= 'Z')
       *s = ((*s - 'a') + 13) % 26 + 'a';
     s++;
+  }
+}
+
+void broadcast(char * msg){//hmmm
+  for(int i=0;i<MAX_CLIENTS;i++){
+    //
+    if(msg && msg[0]){
+      write(toAllClients, msg, sizeof(msg));
+     }
   }
 }
