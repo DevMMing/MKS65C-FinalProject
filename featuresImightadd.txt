@@ -9,6 +9,11 @@ adding sound(time cat > ctrl+c) or (time read) + <enter>
 adding sighandlers to socket to have accurate count of clients on server
 make should compile(no make compile)
 
+Hope i can finish server within <Today-Sunday>
+Hope i can finish game within <Sunday-Monday>
+
+5 days left......
+zzzzzzz.....not time to sleep
 ----
 Semaphores ALL
 Allocating memory + Files + Semaphores > Game/Puzzle/Whatever
