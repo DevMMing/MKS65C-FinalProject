@@ -2,10 +2,14 @@ Spyfall
 Weird GM player game and stuff happens
 -GM controls monster ai and player controls their own actions
 -Both players expend and only hero gains VP.
-~Colorful Text~
+~Colorful Text~<https://stackoverflow.com/questions/3219393/stdlib-and-colored-output-in-c>
 Text Adventure with fun graphics and story
 having more pipes for multiclients
 adding sound(time cat > ctrl+c) or (time read) + <enter>
 adding sighandlers to socket to have accurate count of clients on server
 make should compile(no make compile)
 
+----
+Semaphores ALL
+Allocating memory + Files + Semaphores > Game/Puzzle/Whatever
+Processes + Networking(Pipes replaced by sockets) > Server
