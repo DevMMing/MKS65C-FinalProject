@@ -1,4 +1,4 @@
-# MKS65C-FinalProject#
+# MKS65C-FinalProject
 Glorified chat hub 
 ## Team Member(s)
 * Matthew Ming
