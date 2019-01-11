@@ -3,8 +3,13 @@
 void process(char *s);
 void subserver(int from_client);
 #define MAX_CLIENTS 20
-typedef
-char *clients[MAX_CLIENTS]=""
+typedef struct client{
+  int fd;
+  char * name;
+  int IP;//Or port I don't know
+  char * role;
+};
+client *clients[MAX_CLIENTS];
 
 int main() {
 

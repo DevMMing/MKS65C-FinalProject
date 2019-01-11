@@ -12,7 +12,7 @@ make should compile(no make compile)
 Hope i can finish server within <Today-Sunday>
 Hope i can finish game within <Sunday-Monday>
 
-5 days left......
+4 days left......
 zzzzzzz.....not time to sleep
 ----
 Semaphores ALL
