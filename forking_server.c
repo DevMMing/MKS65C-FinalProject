@@ -2,21 +2,12 @@
 
 void process(char *s);
 void subserver(int from_client);
-#define MAX_CLIENTS 20
-typedef struct client{
-  int fd;
-  char * name;
-  int IP;//Or port I don't know
-  char * role;
-};
-client *clients[MAX_CLIENTS];
+
 
 int main() {
 
   int listen_socket;
-  int f;
-  listen_socket = server_setup();
-
+  int f;//f is for fork....
   while (1) {
 
     int client_socket = server_connect(listen_socket);
