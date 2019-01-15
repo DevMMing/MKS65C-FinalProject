@@ -1,13 +1,5 @@
 #include "networking.h"
-#define MAX_CLIENTS 20
-typedef struct client{
-  struct sockaddr_in addr;
-  int fd;
-  char * name;
-  //int IP;//Or port I don't know
-  int userid;
-};
-client *clients[MAX_CLIENTS];
+
 void error_check( int i, char *s ) {
   if ( i < 0 ) {
     printf("[%s] error %d: %s\n", s, errno, strerror(errno) );
@@ -46,7 +38,7 @@ int server_setup() {
   printf("[server] socket bound\n");
 
   //set socket to listen state
-  i = listen(sd, 10);
+  i = listen(sd, MAX_CLIENTS);
   error_check( i, "server listen" );
   printf("[server] socket in listen state\n");
 
@@ -115,13 +107,4 @@ int client_setup(char * server) {
   freeaddrinfo(results);
 
   return sd;
-}
-void queue_add(client_t *cl){
-	int i;
-	for(i=0;i<MAX_CLIENTS;i++){
-		if(!clients[i]){
-			clients[i] = cl;
-			return;
-		}
-	}
 }
