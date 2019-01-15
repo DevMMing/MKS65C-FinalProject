@@ -1,5 +1,4 @@
 #include "networking.h"
-
 void error_check( int i, char *s ) {
   if ( i < 0 ) {
     printf("[%s] error %d: %s\n", s, errno, strerror(errno) );
@@ -17,8 +16,7 @@ void error_check( int i, char *s ) {
   returns the socket descriptor
   =========================*/
 int server_setup() {
-  int sd, i;
-
+  int sd, i;	
   //create the socket
   sd = socket( AF_INET, SOCK_STREAM, 0 );
   error_check( sd, "server socket" );
@@ -84,7 +82,6 @@ int server_connect(int sd) {
   =========================*/
 int client_setup(char * server) {
   int sd, i;
-
   //create the socket
   sd = socket( AF_INET, SOCK_STREAM, 0 );
   error_check( sd, "client socket" );

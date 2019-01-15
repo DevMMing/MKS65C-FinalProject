@@ -1,5 +1,5 @@
 #include "networking.h"
-#define MAX_CLIENTS 20
+
 void process(char *s);
 void subserver(int from_client);
 
@@ -10,10 +10,6 @@ int main() {
   int f;
   int subserver_count = 0;
   char buffer[BUFFER_SIZE];
-  int clients[MAX_CLIENTS];
-for(int i=0;i<MAX_CLIENTS;i++){
-		clients[i]=0;
-}
 
   //set of file descriptors to read from
   fd_set read_fds;
@@ -70,12 +66,3 @@ void subserver(int client_socket) {
   exit(0);
 }
 
-void process(char * s) {
-  while (*s) {
-    if (*s >= 'a' && *s <= 'z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    else  if (*s >= 'A' && *s <= 'Z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    s++;
-  }
-}
