@@ -9,7 +9,8 @@ int main(int argc, char **argv) {
     server_socket = client_setup( argv[1]);
   else
     server_socket = client_setup( TEST_IP );
-
+printf("Welcome to the Best Chat Server\n");
+printf("Made by the Lone Ranger\n");
   while (1) {
     printf("enter data: ");
     fgets(buffer, sizeof(buffer), stdin);
