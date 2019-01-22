@@ -10,3 +10,4 @@ Or as the Spy, try to figure out where exactly you are.
 ## Execution Instructions
 * make server
 * make client 
+(If messages hang or there is suspicion that messages hang, press <ENTER> twice).
