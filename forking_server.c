@@ -1,53 +1,229 @@
 #include "networking.h"
-
-void process(char *s);
-void subserver(int from_client);
-
+//only works with one server and ctrl+c same terminal
+void broadcast(char *msg);
+void categorize();
+const char* getfield(char* line, int num);
+int randNum();
+typedef struct {
+	int fd;
+	char name[BUFFER_SIZE];
+	int points;
+	char role[BUFFER_SIZE];
+} client_t;
+typedef struct{
+	char name[BUFFER_SIZE];
+	char roles[8][BUFFER_SIZE];
+}location_t;
+location_t *locations[28];
+location_t *currLoc;
+client_t *clients[MAX_CLIENTS];
+int playerC=MAX_CLIENTS;
+int taken[8];
 int main() {
-  int clients[MAX_CLIENTS],servers[MAX_CLIENTS];
-  int listen_socket;
-  int f;
-  listen_socket = server_setup();
-  char buf[BUFFER_SIZE];
- memset(buf,0,BUFFER_SIZE);
-int i=0;
-while(i <MAX_CLIENTS){
-	clients[i]=server_connect(listen_socket);
-	memset(buf,0,BUFFER_SIZE);
-	servers[i]=fork();
-	if(!servers[i]){
-		subserver(clients[i]);
-		close(clients[i]);
-		return 0;
+	for(int i=0;i<28;i++){
+		locations[i]=(location_t *)calloc(1,sizeof(location_t));
+	memset(locations[i]->name,0,BUFFER_SIZE);
+	for(int j=0;j<8;j++){
+		memset(locations[i]->roles[j],0,BUFFER_SIZE);
 	}
-	else{
-		close(clients[i]);
-	}
-	i++;
 }
-printf("Server is no longer accepting players.\n");
-  // shutdown(listen_socket, SHUT_RD);
-  for (int i =0; i < MAX_CLIENTS; i++) {
-    snprintf(buf, sizeof(buf), "You are player %i!", i + 1); // show board, tell that you are player X or O, ask for input
-    write(clients[i], buf, sizeof(buf));
+	categorize();
+	/*for(int i=0;i<28;i++){
+		printf("----Start----\n");
+		printf("Location : %s\n",locations[i]->name);
+		for(int j=0;j<8;j++){
+			printf("%s\n",locations[i]->roles[j]);
+		}
+		printf("----End----\n");
+	}*/
+	for(int i=0;i<MAX_CLIENTS;i++){
+	clients[i]=(client_t *)calloc(1,sizeof(client_t));
+	clients[i]->fd=0;
+	memset(clients[i]->name,0,BUFFER_SIZE);
+	clients[i]->points=0;
+}
+  int listen_socket;
+  int numOfTurns=0;
+  int active=0;
+  char buffer[BUFFER_SIZE];
+  listen_socket = server_setup();//first client sets up limit
+  while(active<playerC){
+	clients[active]->fd=server_connect(listen_socket);
+	  strcpy(buffer,"Welcome to Spyfall\n");
+	  strcat(buffer,"What is your name?");
+      write(clients[active]->fd,buffer,sizeof(buffer));
+	  memset(buffer,0,sizeof(buffer));
+	  read(clients[active]->fd,buffer,sizeof(buffer));
+	  printf("This is %s\n",buffer); 
+	  strcpy(clients[active]->name,buffer);
+		memset(buffer,0,sizeof(buffer));
+		sprintf(buffer,"%d",active);
+		write(clients[active]->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));	  
+	if(!active){//only for client one
+		strcpy(buffer,"Number of players(3-8): ");
+		write(clients[active]->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+		read(clients[active]->fd,buffer,sizeof(buffer));
+		playerC=atoi(buffer);
+		memset(buffer,0,sizeof(buffer));
+	  }
+	  strcpy(buffer,"Awaiting connections...\n");
+	  write(clients[active]->fd,buffer,sizeof(buffer));
+	  memset(buffer,0,sizeof(buffer));
+	  active++;
   }
-  while (1) {
-		for(int i =0; i < MAX_CLIENTS; i++){
-			//printf("%i",clients[i]);
-			read(clients[i],buf,sizeof(buf));
-			write(clients[i],buf,sizeof(buf));
+  for(int i =0;i<playerC;i++){
+  printf("Player %d: %s\n",i+1,clients[i]->name);
+  }
+  currLoc=locations[abs(randNum())%28];
+  int spyEx=0;
+ for(int i=0;i<playerC;i++){
+	 int roleG;
+	 if(spyEx){
+	 roleG=abs(randNum())%(8-i);
+	 }
+	 else{
+		 if(i!=playerC-1){
+			if(abs(randNum())%2){
+				roleG=abs(randNum())%(8-i);
+			}
+			else{
+				roleG=0;
+				spyEx=1;
+			}
+		 }
+		 else{
+			 roleG=0;
+			 spyEx=1;
+		 } 
+	 }
+	 for(int j=0;j<roleG;j++){
+		 if(taken[roleG]){
+		 roleG++;
+		 }
+	 }
+	 taken[roleG]=1;
+		 strcpy(clients[i]->role,currLoc->roles[roleG]);
+		 snprintf(buffer,100,"Your role is %s\n",clients[i]->role);
+		 printf("%s",buffer);
+		write(clients[i]->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+	 }
+	 client_t *tempPlayer=(client_t *)calloc(1,sizeof(client_t));
+	 client_t *lastPlayer=(client_t *)calloc(1,sizeof(client_t));
+	 client_t *currPlayer=clients[abs(randNum())%playerC];
+  while (numOfTurns<20) {
+    for(int i=0;i<playerC;i++){
+		if(clients[i]->fd!=currPlayer->fd){
+			snprintf(buffer,120,"Waiting for %s's turn to finish\n",currPlayer->name);
+			write(clients[i]->fd,buffer,sizeof(buffer));
 		}
 	}
+			sprintf(buffer,"What would you like to do? \n0.Question(.q) \t\t\t\t\t\t\t1.Accuse(.a)\n");
+			write(currPlayer->fd,buffer,sizeof(buffer));
+			memset(buffer,0,sizeof(buffer));
+			read(currPlayer->fd,buffer,sizeof(buffer));
+				if(!strcmp(buffer,".q")){
+				memset(buffer,0,sizeof(buffer));
+				stpcpy(buffer,"Who would you like to question?\n");
+				for(int j=0;j<playerC;j++){
+					if(clients[j]->fd !=currPlayer->fd){
+					char msg[BUFFER_SIZE];
+					snprintf(msg,100,"%s\n",clients[j]->name);
+					strcat(buffer,msg);
+					}
+					else{
+						j++;
+					}
+				}
+				write(currPlayer->fd,buffer,sizeof(buffer));
+				memset(buffer,0,sizeof(buffer));
+				read(currPlayer->fd,buffer,sizeof(buffer));//has to be player name
+				for(int k=0;k<playerC;k++){
+						if(!strcmp(clients[k]->name,buffer)){
+							tempPlayer=clients[k];
+						}
+					}
+				memset(buffer,0,sizeof(buffer));
+				strcpy(buffer,"What is your question?");
+				write(currPlayer->fd,buffer,sizeof(buffer));
+				memset(buffer,0,sizeof(buffer));
+				read(currPlayer->fd,buffer,sizeof(buffer));
+				strcat(buffer,"\nYour response:");
+				write(tempPlayer->fd,buffer,sizeof(buffer));
+				memset(buffer,0,sizeof(buffer));
+				read(tempPlayer->fd,buffer,sizeof(buffer));
+				write(currPlayer->fd,buffer,sizeof(buffer));
+				lastPlayer=currPlayer;
+				currPlayer=tempPlayer;
+				numOfTurns++;
+				}
+				else if(!strcmp(buffer,".a")){
+					memset(buffer,0,sizeof(buffer));
+					strcpy(buffer,"Filler text will finish later\n");
+					write(currPlayer->fd,buffer,sizeof(buffer));
+					memset(buffer,0,sizeof(buffer));
+				}
+				else{
+					memset(buffer,0,sizeof(buffer));
+				stpcpy(buffer,"Invalid input, try again.\n");
+				write(currPlayer->fd,buffer,sizeof(buffer));
+				memset(buffer,0,sizeof(buffer));
+				}
+			}
+	system("pause");
 	return 0;
 }
-void subserver(int client_socket) {
-  char buffer[BUFFER_SIZE];
 
-  while (read(client_socket, buffer, sizeof(buffer))) {
+void broadcast(char * msg) {
+	for(int i=0;i<playerC;i++){
+		write(clients[i]->fd, msg, sizeof(msg));
+	}
+  }
+ void categorize(){
+	 int i=0;
+	FILE* stream = fopen("location.csv", "r");
 
-    printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-    write(client_socket, buffer, sizeof(buffer));
-  }//end read loop
-  close(client_socket);
-  exit(0);
+    char line[1024];
+    while (fgets(line, 1024, stream))
+    {
+		if(i){
+			for(int j=1;j<9;j++){
+				char* tmp = strdup(line);
+				char* tmp2=strdup(line);
+				char* tmp3=strdup(line);
+				if(j==1){
+					strcpy(locations[i-1]->name,getfield(tmp,j));
+					strcpy(locations[i-1]->roles[j-1],"SPY");
+				}
+				else{
+				strcpy(locations[i-1]->roles[j-1],getfield(tmp2, j));
+				}
+				//printf("Field %d would be %s\n", j,getfield(tmp3, j));
+				// NOTE strtok clobbers tmp
+				free(tmp);
+			}
+		}
+		i++;
+    }
+ }
+ const char* getfield(char* line, int num)
+{
+    const char* tok;
+    for (tok = strtok(line, ",");
+            tok && *tok;
+            tok = strtok(NULL, ",\n"))
+    {
+        if (!--num)
+            return tok;
+    }
+    return NULL;
+}
+int randNum(){
+  int c;
+  int file = open("/dev/random",O_RDONLY);
+  read(file,&c,sizeof(c));
+  close(file);
+  return c;
 }

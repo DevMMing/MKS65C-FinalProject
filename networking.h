@@ -8,12 +8,14 @@
 #include <netdb.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
+#include <fcntl.h>
 
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
-#define MAX_CLIENTS 2
-#define BUFFER_SIZE 80
+#define MAX_CLIENTS 8
+#define BUFFER_SIZE 100
 #define PORT "9001"
 #define TEST_IP "127.0.0.1"
 
