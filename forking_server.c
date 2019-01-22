@@ -111,67 +111,96 @@ int main() {
 		memset(buffer,0,sizeof(buffer));
 	 }
 	 client_t *tempPlayer=(client_t *)calloc(1,sizeof(client_t));
-	 client_t *lastPlayer=(client_t *)calloc(1,sizeof(client_t));
 	 client_t *currPlayer=clients[abs(randNum())%playerC];
   while (numOfTurns<20) {
     for(int i=0;i<playerC;i++){
 		if(clients[i]->fd!=currPlayer->fd){
 			snprintf(buffer,120,"Waiting for %s's turn to finish\n",currPlayer->name);
 			write(clients[i]->fd,buffer,sizeof(buffer));
+			memset(buffer,0,sizeof(buffer));
 		}
 	}
-			sprintf(buffer,"What would you like to do? \n0.Question(.q) \t\t\t\t\t\t\t1.Accuse(.a)\n");
+	sprintf(buffer,"What would you like to do? \n0.Question(.q) \t\t\t\t\t\t\t1.Accuse(.a)\n");
+	write(currPlayer->fd,buffer,sizeof(buffer));
+	memset(buffer,0,sizeof(buffer));
+	read(currPlayer->fd,buffer,sizeof(buffer));
+	printf("THING[%s]",buffer);
+		if(!strncmp(buffer,".q",2)){
+		memset(buffer,0,sizeof(buffer));
+		/*strcpy(buffer,"Who would you like to question?\n");
+		for(int j=0;j<playerC;j++){
+			if(clients[j]->fd !=currPlayer->fd){
+			char msg[BUFFER_SIZE];
+			snprintf(msg,100,"%s\n",clients[j]->name);
+			strcat(buffer,msg);
+			}
+		}
+		write(currPlayer->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+		read(currPlayer->fd,buffer,sizeof(buffer));//has to be player name
+		for(int k=0;k<playerC;k++){
+				if(!strcmp(clients[k]->name,buffer)){
+					tempPlayer=clients[k];
+				}
+			}*/
+		tempPlayer=clients[abs(randNum())%playerC];//random because parsing for name is broken
+		memset(buffer,0,sizeof(buffer));
+		strcpy(buffer,"What is your question?");
+		write(currPlayer->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+		read(currPlayer->fd,buffer,sizeof(buffer));
+		strcat(buffer,"\nYour response:");
+		write(tempPlayer->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+		read(tempPlayer->fd,buffer,sizeof(buffer));
+		write(currPlayer->fd,buffer,sizeof(buffer));
+		currPlayer=tempPlayer;
+		numOfTurns++;
+		}
+		else if(!strncmp(buffer,".a",2)){
+			char accuse[120];
+			memset(buffer,0,sizeof(buffer));
+			strcpy(buffer,"Who do you think is a Spy?");
 			write(currPlayer->fd,buffer,sizeof(buffer));
 			memset(buffer,0,sizeof(buffer));
 			read(currPlayer->fd,buffer,sizeof(buffer));
-				if(!strcmp(buffer,".q")){
+			strcpy(accuse,buffer);
+			memset(buffer,0,sizeof(buffer));
+			int yes_count=0;
+			int no_count=0;
+			for(int a=0;a<playerC;a++){
+				sprintf(buffer,"Do you think %s, is the Spy?(y/n)",accuse);
+				write(clients[a]->fd,buffer,sizeof(buffer));
 				memset(buffer,0,sizeof(buffer));
-				stpcpy(buffer,"Who would you like to question?\n");
-				for(int j=0;j<playerC;j++){
-					if(clients[j]->fd !=currPlayer->fd){
-					char msg[BUFFER_SIZE];
-					snprintf(msg,100,"%s\n",clients[j]->name);
-					strcat(buffer,msg);
-					}
-					else{
-						j++;
-					}
+				read(clients[a]->fd,buffer,sizeof(buffer));
+				if(!strcmp(&buffer[0],"y")){
+				yes_count++;
 				}
-				write(currPlayer->fd,buffer,sizeof(buffer));
-				memset(buffer,0,sizeof(buffer));
-				read(currPlayer->fd,buffer,sizeof(buffer));//has to be player name
-				for(int k=0;k<playerC;k++){
-						if(!strcmp(clients[k]->name,buffer)){
-							tempPlayer=clients[k];
-						}
-					}
-				memset(buffer,0,sizeof(buffer));
-				strcpy(buffer,"What is your question?");
-				write(currPlayer->fd,buffer,sizeof(buffer));
-				memset(buffer,0,sizeof(buffer));
-				read(currPlayer->fd,buffer,sizeof(buffer));
-				strcat(buffer,"\nYour response:");
-				write(tempPlayer->fd,buffer,sizeof(buffer));
-				memset(buffer,0,sizeof(buffer));
-				read(tempPlayer->fd,buffer,sizeof(buffer));
-				write(currPlayer->fd,buffer,sizeof(buffer));
-				lastPlayer=currPlayer;
-				currPlayer=tempPlayer;
-				numOfTurns++;
-				}
-				else if(!strcmp(buffer,".a")){
-					memset(buffer,0,sizeof(buffer));
-					strcpy(buffer,"Filler text will finish later\n");
-					write(currPlayer->fd,buffer,sizeof(buffer));
-					memset(buffer,0,sizeof(buffer));
+				else if(!strcmp(&buffer[0],"n")){
+				no_count++;
 				}
 				else{
 					memset(buffer,0,sizeof(buffer));
-				stpcpy(buffer,"Invalid input, try again.\n");
-				write(currPlayer->fd,buffer,sizeof(buffer));
-				memset(buffer,0,sizeof(buffer));
+					strcpy(buffer,"Invalid input. Vote has been terminated");
+					write(clients[a]->fd, buffer,sizeof(buffer));
 				}
 			}
+			if(yes_count >=no_count){
+				printf("yes");
+				exit(1);
+			}
+			else{
+				printf("no");
+				exit(1);
+			}
+		}
+		else{
+			memset(buffer,0,sizeof(buffer));
+		stpcpy(buffer,"Invalid input, try again.\n");
+		write(currPlayer->fd,buffer,sizeof(buffer));
+		memset(buffer,0,sizeof(buffer));
+		}
+	}
 	system("pause");
 	return 0;
 }
