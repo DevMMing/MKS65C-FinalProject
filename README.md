@@ -9,5 +9,6 @@ Or as the Spy, try to figure out where exactly you are.
 * None 
 ## Execution Instructions
 * make server
-* make client 
+* make client args="IP_OF_SERVER"(use 127.0.0.1 as default)
+
 (If messages hang or there is suspicion that messages hang, press <ENTER> twice).
